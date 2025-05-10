@@ -1,5 +1,6 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ChannelsModule } from './channels/channels.module';
@@ -27,6 +28,19 @@ import { WorkspacesModule } from './workspaces/workspaces.module';
     WorkspacesModule,
     ChannelsModule,
     DmsModule,
+    TypeOrmModule.forRoot({
+      type: 'mysql',
+      host: process.env.DB_HOST,
+      port: +process.env.DB_PORT,
+      username: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_DATABASE,
+      autoLoadEntities: true,
+      synchronize: false,
+      logging: true,
+      charset: 'utf8mb4',
+      extra: { connectionLimit: 10, keepConnectionAlive: true },
+    }),
   ],
   controllers: [AppController],
   providers: [
