@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { AuthModule } from './auth/auth.module';
 import { ChannelsModule } from './channels/channels.module';
 import { DmsModule } from './dms/dms.module';
 import { ChannelChats } from './entities/ChannelChats';
@@ -32,6 +33,7 @@ import { WorkspacesModule } from './workspaces/workspaces.module';
       envFilePath: '.env',
       // load: [getEnv],
     }),
+    AuthModule,
     UsersModule,
     WorkspacesModule,
     ChannelsModule,

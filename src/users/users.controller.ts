@@ -1,8 +1,12 @@
-import { Body, Controller, Get, Post, Req, Res, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, Res, UseGuards, UseInterceptors } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { LocalAuthGuard } from 'src/auth/local-auth-guard';
+import { LoggedInGuard } from 'src/auth/logged-in-guard';
+import { NotLoggedInGuard } from 'src/auth/not-logged-in-guard';
 import { User } from 'src/common/decorators/user.decorator';
 import { UserDto } from 'src/common/dto/user.dto';
 import { UndefinedToNullInterceptor } from 'src/common/interceptors/undefunedToNull.interceptor';
+import { Users } from 'src/entities/Users';
 import { JoinRequestDto } from './dto/join.request.dto';
 import { UsersService } from './users.service';
 
@@ -24,9 +28,10 @@ export class UsersController {
   @ApiOperation({ summary: '내 정보 조회' })
   @Get()
   getUsers(@User() user) {
-    return user;
+    return user || false;
   }
 
+  @UseGuards(new NotLoggedInGuard())
   @ApiOperation({ summary: '회원가입' })
   @ApiResponse({
     status: 200,
@@ -34,7 +39,7 @@ export class UsersController {
   })
   @Post()
   async join(@Body() data: JoinRequestDto) {
-    await this.usersService.join(data.nickname, data.email, data.password);
+    await this.usersService.join(data);
   }
 
   @ApiResponse({
@@ -43,11 +48,13 @@ export class UsersController {
     description: '로그인 성공',
   })
   @ApiOperation({ summary: '로그인' })
+  @UseGuards(LocalAuthGuard)
   @Post('login')
-  login(@User() user) {
+  login(@User() user: Users) {
     return user;
   }
 
+  @UseGuards(new LoggedInGuard())
   @ApiOperation({ summary: '로그아웃' })
   @ApiResponse({
     status: 200,
